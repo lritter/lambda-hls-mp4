@@ -1,0 +1,25 @@
+{
+  "name": "lambda-hls-ffmpeg",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AWS Lambda function to turn HLS stream into mp4",
+  "engines": {
+    "node": ">=6.10",
+    "npm": ">=3"
+  },
+  "main": "index.js",
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.32",
+    "@babel/core": "^7.0.0-beta.32",
+    "@babel/node": "^7.0.0-beta.32",
+    "@babel/preset-env": "^7.0.0-beta.32"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "dependencies": {
+    "node-mkdirp": "0.0.1"
+  }
+}
