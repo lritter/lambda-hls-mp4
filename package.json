@@ -30,6 +30,7 @@
     ]
   },
   "dependencies": {
+    "aws-sdk": "^2.163.0",
     "mkdirp": "^0.5.1"
   }
 }
