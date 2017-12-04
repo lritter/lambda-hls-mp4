@@ -1,13 +1,16 @@
 'use strict';
 
-import {tmpdir} from 'os';
-import {join} from 'path';
-import {createHash} from 'crypto';
-import {spawn, execFile} from 'child_process';
-import {existsSync} from 'fs';
-import {mkdirP} from 'mkdirp'
+const tmpdir = require('os').tmpdir;
+const join = require('path').join;
+const createHash = require('crypto').createHash;
+const spawn = require('child_process').spawn;
+const execFile = require('child_process').execFile;
+const existsSync = require('fs').existsSync;
+const mkdirp = require('mkdirp');
 
 let log = console.log;
+
+const ffmpegPath = process.env['LAMBDA_TASK_ROOT'] ? './ffmpeg' : 'ffmpeg';
 
 // /** @type string **/
 // const tempDir = process.env['TEMP'] || tmpdir();
@@ -18,7 +21,7 @@ function setupWorkspaceSync(tmp, baggage = {}) {
     var tmpDir = tmp || tmpdir();
     var out = join(tmpDir, 'outputs');
     if (!existsSync(out)) {
-      	if(!mkdirP.sync(out)) {
+      	if(!mkdirp.sync(out)) {
           reject(`couldn't make ${out}`);
         }
     }
@@ -64,7 +67,7 @@ function ffmpeg(input, output, baggage = {}) {
 			// cwd: baggage.tmp.tmpDir
 		};
 
-		var ff = spawn('ffmpeg', args, opts);
+		var ff = spawn(ffmpegPath, args, opts);
 		ff.on('message', msg => log(msg))
 		  .on('error', reject)
 			.on('close', status => {
@@ -97,9 +100,9 @@ function storeFile(file, target, baggage = {}) {
   });
 }
 
-export function main() {
+function main(cb) {
   var baggage = {};
-  var input = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
+  var input = "http://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
 
   checkInput(input, baggage)
   .then(result => {
@@ -116,6 +119,7 @@ export function main() {
   })
   .then(result => {
     log(result);
+    cb(null, result);
   });
 
   /*
@@ -135,3 +139,5 @@ export function main() {
   */
 
 }
+
+exports.main = main;
