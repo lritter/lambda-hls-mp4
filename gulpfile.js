@@ -14,9 +14,9 @@ const zip = require('gulp-zip');
 const runSequence = require('run-sequence');
 
 const buildDir = 'build';
-const filename = path.join(buildDir, 'ffmpeg-build-lambda.tar.gz');
-const releaseUrl = 'https://api.github.com/repos/binoculars/ffmpeg-build-lambda/releases/latest';
-
+// const filename = path.join(buildDir, 'ffmpeg-build-lambda.tar.gz');
+// const releaseUrl = 'https://api.github.com/repos/binoculars/ffmpeg-build-lambda/releases/latest';
+//
 function request(url, toPipe, retries = 0) {
   const options = parse(url);
   options.headers = {
@@ -64,6 +64,8 @@ function request(url, toPipe, retries = 0) {
   });
 }
 
+const binariesDir = 'binaries';
+
 gulp.task('download-ffmpeg', cb => {
   if (!fs.existsSync(buildDir))
     fs.mkdirSync(buildDir);
@@ -93,17 +95,15 @@ gulp.task('untar-ffmpeg', () => {
 });
 
 gulp.task('copy-ffmpeg', () => {
-  const [wd] = fs
-    .readdirSync(buildDir)
-    .filter(item => fs
-      .statSync(path.join(buildDir, item))
-      .isDirectory()
-    );
+  // let copySrcDir = binariesDir; // Change to buildDir when using remote ffmpeg crap
+  // const [wd] = fs.readdirSync(copySrcDir);
+    // .filter(item => fs
+    //   .statSync(path.join(copySrcDir, item))
+    //   .isDirectory()
+    // );
 
   return gulp
-    .src(process.env.CI ? '*' : 'ff*', {
-      cwd: path.join(buildDir, wd)
-    })
+    .src('./binaries/*')
     .pipe(gulp.dest('dist'));
 });
 
@@ -149,9 +149,9 @@ gulp.task('copy-source', () => gulp
 gulp.task('build-package', () => runSequence(
   'clean',
   'copy-source',
-  'download-ffmpeg',
+  // 'download-ffmpeg',
   'npm',
-  'untar-ffmpeg',
+  // 'untar-ffmpeg',
   'copy-ffmpeg',
   'zip'
 ));

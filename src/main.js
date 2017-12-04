@@ -7,11 +7,17 @@ const spawn = require('child_process').spawn;
 const execFile = require('child_process').execFile;
 const existsSync = require('fs').existsSync;
 const mkdirp = require('mkdirp');
+const fs = require('fs');
 
 let log = console.log;
 
-const ffmpegPath = process.env['LAMBDA_TASK_ROOT'] ? './ffmpeg' : 'ffmpeg';
-
+const ffmpegPath = process.env['LAMBDA_TASK_ROOT'] ? './ffmpeg-engine' : 'ffmpeg';
+const rootPath = process.env['LAMBDA_TASK_ROOT'] ? process.env['LAMBDA_TASK_ROOT'] : ''
+const ffmpegEnvLambda = {
+  "LD_PRELOAD":`${rootPath}/libX11.so.6:${rootPath}/libXau.so.6:${rootPath}/libXdmcp.so.6:${rootPath}/libXext.so.6:${rootPath}/libXv.so.1:${rootPath}/libbz2.so.1.0`
+};
+const ffmpegEnv = process.env['LAMBDA_TASK_ROOT'] ? ffmpegEnvLambda : {};
+const tmpRoot = process.env['TEMP'] || tmpdir();
 // /** @type string **/
 // const tempDir = process.env['TEMP'] || tmpdir();
 // const outputDir = join(tempDir, 'outputs');
@@ -50,6 +56,8 @@ function computeOutputFileName(input, baggage = {}) {
 
 function ffmpeg(input, output, baggage = {}) {
 	log('Starting FFmpeg');
+  log('env:');
+  log(process.env);
 
 	return new Promise((resolve, reject) => {
 
@@ -62,12 +70,18 @@ function ffmpeg(input, output, baggage = {}) {
       '-c:v', 'copy',
       output
 		];
-    log(args);
+
 		const opts = {
+      env: ffmpegEnv
 			// cwd: baggage.tmp.tmpDir
 		};
 
+    console.log(opts);
+
+    console.log(fs.readdirSync('.'));
+
 		var ff = spawn(ffmpegPath, args, opts);
+    // var ff = spawn('ldd', [ffmpegPath], opts);
 		ff.on('message', msg => log(msg))
 		  .on('error', reject)
 			.on('close', status => {
@@ -106,7 +120,7 @@ function main(cb) {
 
   checkInput(input, baggage)
   .then(result => {
-    return setupWorkspaceSync(process.env['TEMP'], result);
+    return setupWorkspaceSync(tmpRoot, result);
   })
   .then(result => {
     return computeOutputFileName(result.input, result);
@@ -115,11 +129,14 @@ function main(cb) {
     return ffmpeg(result.input, result.output.fullPath, result);
   })
   .then(result => {
-    return storeFile(result.transcodeResults.outputFile, join('.', 'result.mp4'), result);
+    console.log(result);
+    return storeFile(result.transcodeResults.outputFile, join(result.tmp.outputsDir, 'result.mp4'), result);
   })
   .then(result => {
     log(result);
     cb(null, result);
+  }).catch(reason => {
+    cb(reason, null);
   });
 
   /*
