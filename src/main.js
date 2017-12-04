@@ -105,9 +105,12 @@ function storeFile(file, target, baggage = {}) {
   return new Promise((resolve, reject) => {
     const s3 = new AWS.S3();
     const params = { 
+      ACL    : "public-read",
       Bucket : 'hls-stitcher', 
       Key    : baggage.output.filename, 
-      Body   : fs.createReadStream(file) };
+      Body   : fs.createReadStream(file),
+      ContentDisposition : 'download_title.mp4'
+    };
     s3.upload(params, function (err, data) {
       if (err) {
         reject(err);
