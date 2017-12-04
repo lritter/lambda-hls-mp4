@@ -16,7 +16,7 @@ exports.handler = (event, context, callback) => {
             callback(null, 'pong');
             break;
         case 'convert':
-            const hlsStream = 'http://s3.amazonaws.com/s3-p.animoto.com/Stream/wfuFvIlS99sjLoUkQTT2WA/hls.360p15.m3u8';
+            const hlsStream = 'https://s3.amazonaws.com/s3-p.animoto.com/Stream/wfuFvIlS99sjLoUkQTT2WA/hls.360p15.m3u8';
             const renderTitle = 'bobs your uncle';
             main(hlsStream, renderTitle, callback);
             break;
