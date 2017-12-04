@@ -14,7 +14,7 @@ let log = console.log;
 const ffmpegPath = process.env['LAMBDA_TASK_ROOT'] ? './ffmpeg-engine' : 'ffmpeg';
 const rootPath = process.env['LAMBDA_TASK_ROOT'] ? process.env['LAMBDA_TASK_ROOT'] : ''
 const ffmpegEnvLambda = {
-  "LD_PRELOAD":`${rootPath}/libX11.so.6:${rootPath}/libXau.so.6:${rootPath}/libXdmcp.so.6:${rootPath}/libXext.so.6:${rootPath}/libXv.so.1:${rootPath}/libbz2.so.1.0`
+  "LD_PRELOAD":`${rootPath}/libX11.so.6:${rootPath}/libXau.so.6:${rootPath}/libXdmcp.so.6:${rootPath}/libXext.so.6:${rootPath}/libXv.so.1:${rootPath}/libbz2.so.1.0:${rootPath}/libssl.so.1.0.0`
 };
 const ffmpegEnv = process.env['LAMBDA_TASK_ROOT'] ? ffmpegEnvLambda : {};
 const tmpRoot = process.env['TEMP'] || tmpdir();
