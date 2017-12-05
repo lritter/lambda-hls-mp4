@@ -1,6 +1,7 @@
 'use strict';
 
 const main = require('./main').main;
+const querystring = require('querystring');
 
 exports.handler = (event, context, callback) => {
     const req = event;
@@ -16,7 +17,8 @@ exports.handler = (event, context, callback) => {
             callback(null, 'pong');
             break;
         case 'convert':
-            const hlsStream = req.queryStringParameters.input || 'https://s3.amazonaws.com/s3-p.animoto.com/Stream/wfuFvIlS99sjLoUkQTT2WA/hls.360p15.m3u8';
+            const hlsKey = req.queryStringParameters.input || 's3-p.animoto.com/Stream/wfuFvIlS99sjLoUkQTT2WA/hls.360p15.m3u8';
+            const hlsStream = `https://s3.amazonaws.com/${querystring.unescape(hlsKey)}`;
             const renderTitle = req.queryStringParameters.title || 'bobs your uncle';
             let makeResponse = (err, result) => {
                 let response = {};
