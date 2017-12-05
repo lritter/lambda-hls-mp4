@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# stuff packaged for lambda
+dist/*
+dist.zip
